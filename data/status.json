@@ -1,0 +1,39 @@
+{
+    "first_year": {
+        "content": "- 研究思路",
+        "duration": 12,
+        "amout": 1
+    },
+    "call_for_paper": {
+        "content": "- 论文征稿",
+        "duration": 6
+    },
+    "broken_equipment": {
+        "content": "- 实验仪器故障",
+        "duration": 1
+    },
+    "upgrade_equipment": {
+        "content": "- 实验仪器升级",
+        "duration": "infinity",
+        "amout": 0.3
+    },
+    "cloud_storage": {
+        "content": "- 云储存",
+        "duration": "infinity"
+    },
+    "exhaustion": {
+        "content": "- 精疲力竭",
+        "duration": "infinity",
+        "amout": -5
+    },
+    "late_year_anxiety": {
+        "content": "- 毕业焦虑",
+        "duration": "infinity",
+        "amout": -1
+    },
+    "unhappy_advisor": {
+        "content": "- 变态导师",
+        "duration": "infinity",
+        "amout": -5
+    }
+}

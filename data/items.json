@@ -1,0 +1,12 @@
+{
+    "idea": "- 研究思路",
+    "perliminary_result": "- 初步结果",
+    "major_result": "- 主要结果",
+    "figure": "- 实验图表",
+    "paper": "- 成稿论文",
+    "submitted_paper": "- 投稿论文",
+    "resubmitted_paper": "- 重投论文",
+    "reject_paper": "- 被拒论文",
+    "conference_paper": "- 会议论文",
+    "submitted_conf_paper": "- 会议投稿论文"
+}

@@ -1,6 +1,7 @@
 import pygame  
 import sys 
 import random
+import json
 import TextLibrary
 import Button
 
@@ -11,7 +12,7 @@ window_width = 800              # 窗口宽度
 window_height = 600             # 窗口高度
 margin = 10                     # 间隔
 yr, mh = 1, 1                   # 年份、月份
-score = 100                     # 毕业希望
+hope = 100                     # 毕业希望
 
 window = pygame.display.set_mode((window_width, window_height))     # 初始化显示窗口
 pygame.display.set_caption("博士研磨记")                             # 设置窗口标题  
@@ -46,8 +47,21 @@ exit_flag = True                                                # 弹出游戏�
 font_version = pygame.font.SysFont("segoeuisemibold", 11)       # 添加字体
 font = pygame.font.SysFont("simhei", 18)                        # 黑体
 font_small = pygame.font.SysFont("simhei", 16)
-text = TextLibrary.TextLibrary()
 """----------------------参数设置完毕----------------------"""
+
+"""----------------------导入游戏数据----------------------"""
+with open('./data/message.json', 'r', encoding='utf-8') as f:  
+    message = json.load(f)
+
+with open('./data/button.json', 'r', encoding='utf-8') as f:  
+    button = json.load(f)
+
+with open('./data/items.json', 'r', encoding='utf-8') as f:  
+    items = json.load(f)
+
+with open('./data/status.json', 'r', encoding='utf-8') as f:
+    status = json.load(f)
+"""----------------------导入数据完毕----------------------"""
 while game_flag:  
   
     # 清除屏幕  
@@ -65,7 +79,7 @@ while game_flag:
     pygame.draw.rect(window, frame_color, rect_box, 2)                  # 绘制边框，“2”代表边框宽度
 
     # 显示文字
-    hope_str = "毕业希望 {}/100".format(score)                          # 创建文字对象
+    hope_str = "毕业希望 {}/100".format(hope)                          # 创建文字对象
     hope_text = font.render(hope_str, True, text_color, box_color)      # 设置文字
     hope_text_width, hope_text_height = hope_text.get_size()             # 得到文字位置
     window.blit(hope_text, (20*margin, 1.5*margin))                     # 显示在窗口中
@@ -97,7 +111,7 @@ while game_flag:
 
     # 显示文字
     # info_str = "恭喜您收到了我们的博士录取通知书！您愿意来我们学院读博吗？"
-    info_str = text.get_text('welcome')
+    info_str = message['welcome']
     info_text = font.render(info_str, True, text_color, box_color)
     info_text_width, info_text_height = info_text.get_size()
     window.blit(info_text, (rect_box.x+margin,rect_box.y+margin))
@@ -134,9 +148,9 @@ while game_flag:
     pygame.draw.rect(window, frame_color, rect_box, 2)              # 绘制边框，“2”代表边框宽度
     
     # 显示文字
-    thing_text = font.render("物品：", True, text_color, box_color)      # 设置文字
-    thing_text_width, thing_text_height = thing_text.get_size()          # 得到文字位置
-    window.blit(thing_text, (rect_box.x+margin,rect_box.y+margin))      # 显示在窗口中
+    item_text = font.render("物品：", True, text_color, box_color)      # 设置文字
+    item_text_width, item_text_height = item_text.get_size()          # 得到文字位置
+    window.blit(item_text, (rect_box.x+margin,rect_box.y+margin))      # 显示在窗口中
 
 
     # 第四个框，显示状态
@@ -154,15 +168,15 @@ while game_flag:
     pygame.draw.rect(window, frame_color, rect_box, 2)              # 绘制边框，“2”代表边框宽度
 
     # 显示文字
-    state_text = font.render("状态：", True, text_color, box_color)      # 设置文字
-    state_text_width, state_text_height = state_text.get_size()          # 得到文字位置
-    window.blit(state_text, (margin+rect_box.x, margin+rect_box.y))      # 显示在窗口中
+    status_text = font.render("状态：", True, text_color, box_color)      # 设置文字
+    status_text_width, status_text_height = status_text.get_size()          # 得到文字位置
+    window.blit(status_text, (margin+rect_box.x, margin+rect_box.y))      # 显示在窗口中
 
     # 状态1
-    state_text1_str = "- 激动人心的第一年"
-    state_text1 = font_small.render(state_text1_str, True, text_color, box_color)
-    state_text1_width, state_text1_height = state_text.get_size()
-    window.blit(state_text1, (margin+rect_box.x, 1.5*margin+rect_box.y+state_text_height))
+    status_text1_str = text.get_status_texts('init')
+    status_text1 = font_small.render(status_text1_str, True, text_color, box_color)
+    status_text1_width, status_text1_height = status_text.get_size()
+    window.blit(status_text1, (margin+rect_box.x, 1.5*margin+rect_box.y+status_text_height))
 
     # 最下方的版权和版本号
     # -------------------------------------------------------------------------------------------------------- #
@@ -178,6 +192,11 @@ while game_flag:
     for event in pygame.event.get():  
         if event.type == pygame.QUIT:  
             game_flag = False  
+        if event.type == pygame.MOUSEBUTTONDOWN:    # 按下按钮后，月份发生变化
+            mh += 1
+            if mh > 12:
+                mh = 1
+                yr += 1
         accept_btn.handle_event(event)
         reject_btn.handle_event(event)
 
