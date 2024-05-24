@@ -2,9 +2,10 @@ import pygame
 import sys 
 import random
 import json
-import TextLibrary
 import Button
+from fun import add_date
 
+"""----------------------1.1 设置初始参数----------------------"""
 version = '0.1.0'               # 游戏版本
 author = "Lingwei Li"           # 游戏作者
 pygame.init()                   # 初始化
@@ -12,12 +13,11 @@ window_width = 800              # 窗口宽度
 window_height = 600             # 窗口高度
 margin = 10                     # 间隔
 yr, mh = 1, 1                   # 年份、月份
+click_num = 0
 hope = 100                     # 毕业希望
-
 window = pygame.display.set_mode((window_width, window_height))     # 初始化显示窗口
 pygame.display.set_caption("博士研磨记")                             # 设置窗口标题  
-
-# 颜色设置
+"""----------------------1.2 设置颜色参数----------------------"""
 bg_color = (111, 202, 239)      # 背景颜色
 box_color = (255, 244, 225)     # 文字框颜色
 shadow_color = (91, 145, 165)   # 阴影颜色
@@ -26,30 +26,25 @@ btn_color = (245, 222, 179)     # 按钮颜色
 btn_frm_color = (220, 190, 74)  # 按钮边框颜色
 btn_frm_change_color = (164, 136, 83) # 按钮边框选中颜色
 text_color = (0, 0, 0)          # 文字颜色
-
-
-# 设置画布
+"""----------------------1.3 设置画布参数----------------------"""
 start_surface = pygame.Surface(window.get_size())
 start_surface = start_surface.convert()     # 使用convert可以转换格式，提高blit的速度
 start_surface.fill(bg_color)
-
-"""----------------------设置边框参数----------------------"""
+"""----------------------1.4 设置边框参数----------------------"""
 factor = 1.3                        # 阴影扩散因子
 divide = 20                         # 高度划分格数
 base_width = window_width-2*margin  # 基准宽度
 base_height = window_height/divide  # 基准高度
-"""----------------------参数设置完毕----------------------"""
-
-"""----------------------设置其他参数----------------------"""
+"""----------------------1.5 设置标志参数----------------------"""
 login_flag = True                                               # 登录窗口的标志
-game_flag = True                                                # 控制游戏进行的标志
+isgame_flag = True                                              # 控制游戏进行的标志
 exit_flag = True                                                # 弹出游戏结束窗口的标志
+game_flag = "start"
+"""----------------------1.6 设置字体参数----------------------"""
 font_version = pygame.font.SysFont("segoeuisemibold", 11)       # 添加字体
 font = pygame.font.SysFont("simhei", 18)                        # 黑体
 font_small = pygame.font.SysFont("simhei", 16)
-"""----------------------参数设置完毕----------------------"""
-
-"""----------------------导入游戏数据----------------------"""
+"""----------------------1.7 导入游戏数据----------------------"""
 with open('./data/message.json', 'r', encoding='utf-8') as f:  
     message = json.load(f)
 
@@ -61,8 +56,14 @@ with open('./data/items.json', 'r', encoding='utf-8') as f:
 
 with open('./data/status.json', 'r', encoding='utf-8') as f:
     status = json.load(f)
-"""----------------------导入数据完毕----------------------"""
-while game_flag:  
+
+with open('./data/flags.json', 'r',  encoding='utf-8') as f:
+    flags = json.load(f)
+
+"""----------------------2 游戏开始----------------------"""
+info_str = message['welcome']
+btn4_str = button['reject']
+while isgame_flag:  
   
     # 清除屏幕  
     window.fill(bg_color)  # 背景颜色
@@ -79,14 +80,12 @@ while game_flag:
     pygame.draw.rect(window, frame_color, rect_box, 2)                  # 绘制边框，“2”代表边框宽度
 
     # 显示文字
-    hope_str = "毕业希望 {}/100".format(hope)                          # 创建文字对象
+    hope_str = "毕业希望 {}/100".format(hope)                            # 创建文字对象
     hope_text = font.render(hope_str, True, text_color, box_color)      # 设置文字
-    hope_text_width, hope_text_height = hope_text.get_size()             # 得到文字位置
     window.blit(hope_text, (20*margin, 1.5*margin))                     # 显示在窗口中
     
-    time_str = "第 {} 年 {} 月".format(yr, mh)                          # 创建文字对象
+    time_str = "第 {} 年 {} 月".format(yr, mh)                           # 创建文字对象
     time_text = font.render(time_str, True, text_color, box_color)      # 设置文字
-    time_text_width, time_text_height = hope_text.get_size()             # 得到文字位置
     window.blit(time_text, (window_width/2+10*margin, 1.5*margin))      # 显示在窗口中
 
     # 第二个框，显示文字
@@ -110,28 +109,31 @@ while game_flag:
     bottom_right = (rect_box.x+rect_box.w, rect_box.y+rect_box.h)   # 右下角
 
     # 显示文字
-    # info_str = "恭喜您收到了我们的博士录取通知书！您愿意来我们学院读博吗？"
-    info_str = message['welcome']
+    # info_str = message['welcome']
     info_text = font.render(info_str, True, text_color, box_color)
     info_text_width, info_text_height = info_text.get_size()
     window.blit(info_text, (rect_box.x+margin,rect_box.y+margin))
 
     # 按钮区（从下往上建立）
     # 第四个按钮
-    accept_btn = Button.Button(window, "拒绝", bottom_left[0]+margin, bottom_left[1]-base_height*2, base_width-2*margin, base_height*1.5, btn_color, btn_frm_color, btn_frm_change_color)
-    accept_btn.draw()
-
-    # 第三个按钮
-    reject_btn = Button.Button(window, "接受", bottom_left[0]+margin, bottom_left[1]-base_height*3.5-0.5*margin, base_width-2*margin, base_height*1.5, btn_color, btn_frm_color, btn_frm_change_color)  
+    # btn4_str = button['reject']
+    reject_btn = Button.Button(window, btn4_str, bottom_left[0]+margin, bottom_left[1]-base_height*2, base_width-2*margin, base_height*1.5)
     reject_btn.draw()
 
-    # 第二个按钮
-    button2 = Button.Button(window, "选择2", bottom_left[0]+margin, bottom_left[1]-base_height*5-1*margin, base_width-2*margin, base_height*1.5, btn_color, btn_frm_color, btn_frm_change_color)
-    button2.draw()
+    # 第三个按钮
+    btn3_str = button['accept']
+    accept_btn = Button.Button(window, btn3_str, bottom_left[0]+margin, bottom_left[1]-base_height*3.5-0.5*margin, base_width-2*margin, base_height*1.5)  
+    accept_btn.draw()
 
-    # 第一个按钮
-    button1 = Button.Button(window, "选择1", bottom_left[0]+margin, bottom_left[1]-base_height*6.5-1.5*margin, base_width-2*margin, base_height*1.5, btn_color, btn_frm_color, btn_frm_change_color)
-    button1.draw()
+    # 第1年1月不显示这俩按钮
+    if game_flag != "start" and game_flag != "end1":
+        # 第二个按钮
+        button2 = Button.Button(window, "选择2", bottom_left[0]+margin, bottom_left[1]-base_height*5-1*margin, base_width-2*margin, base_height*1.5)
+        button2.draw()
+
+        # 第一个按钮
+        button1 = Button.Button(window, "选择1", bottom_left[0]+margin, bottom_left[1]-base_height*6.5-1.5*margin, base_width-2*margin, base_height*1.5)
+        button1.draw()
 
     # 第三个框，显示物品
     # -------------------------------------------------------------------------------------------------------- #
@@ -169,11 +171,11 @@ while game_flag:
 
     # 显示文字
     status_text = font.render("状态：", True, text_color, box_color)      # 设置文字
-    status_text_width, status_text_height = status_text.get_size()          # 得到文字位置
+    status_text_width, status_text_height = status_text.get_size()        # 得到文字位置
     window.blit(status_text, (margin+rect_box.x, margin+rect_box.y))      # 显示在窗口中
 
     # 状态1
-    status_text1_str = text.get_status_texts('init')
+    status_text1_str = status['first_year']['content']
     status_text1 = font_small.render(status_text1_str, True, text_color, box_color)
     status_text1_width, status_text1_height = status_text.get_size()
     window.blit(status_text1, (margin+rect_box.x, 1.5*margin+rect_box.y+status_text_height))
@@ -188,24 +190,36 @@ while game_flag:
     bottom_text_width, bottom_text_height = bottom_text.get_size()
     window.blit(bottom_text, ((window_width-bottom_text_width)/2, window_height-1.5*margin))        # 显示出来
 
+    # -------------------------------------------------------------------------------------------------------- #
     # 处理事件队列  
+    # -------------------------------------------------------------------------------------------------------- #
     for event in pygame.event.get():  
         if event.type == pygame.QUIT:  
-            game_flag = False  
-        if event.type == pygame.MOUSEBUTTONDOWN:    # 按下按钮后，月份发生变化
+            isgame_flag = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
             mh += 1
             if mh > 12:
-                mh = 1
                 yr += 1
-        accept_btn.handle_event(event)
-        reject_btn.handle_event(event)
+                mh = 1
+        accept_btn_flag = accept_btn.handle_event(event)
+        reject_btn_flag = reject_btn.handle_event(event)
+    
+    # -------------------------------------------------------------------------------------------------------- #
+    # 游戏逻辑部分
+    # -------------------------------------------------------------------------------------------------------- #
+    if reject_btn_flag:
+        accept_btn.set_flag(False)
+        game_flag = flags['end1']
+        info_str = message['reject']
+        btn3_str = button['accept']
+        btn4_str = button['restart']
 
   
     # 更新屏幕显示  
     pygame.display.flip()  
   
     # 控制帧率  
-    pygame.time.Clock().tick(60)  
+    pygame.time.Clock().tick(24)  
   
 # 退出游戏  
 pygame.quit()  

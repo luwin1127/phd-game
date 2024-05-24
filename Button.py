@@ -2,19 +2,20 @@ import pygame
   
 class Button: 
     '''定义按钮类 '''
-    def __init__(self, window, text, x, y, width, height, btn_color, btn_frm_color, btn_frm_change_color):  
+    def __init__(self, window, text, x, y, width, height):  
         self.window = window  
         self.text = text  
         self.x = x  
         self.y = y  
         self.width = width  
-        self.height = height  
-        self.btn_color = btn_color  
-        self.btn_frm_color = btn_frm_color
-        self.btn_frm_change_color = btn_frm_change_color  
+        self.height = height
+        self.btn_color = (245, 222, 179)  
+        self.btn_frm_color = (220, 190, 74)
+        self.btn_frm_change_color = (164, 136, 83)  
         self.rect = pygame.Rect(x, y, width, height)  
-        self.font = pygame.font.SysFont("simhei", 16)  # 使用系统默认字体和指定大小  
-  
+        self.font = pygame.font.SysFont("simhei", 16)
+        self.btn_flag = False # 按钮是否按下的标志
+        
     def draw(self):
         '''根据鼠标位置设置颜色  '''
         if self.rect.collidepoint(pygame.mouse.get_pos()):  # 检测一个点是否包含在该 Rect 对象中
@@ -32,5 +33,12 @@ class Button:
     def handle_event(self, event):  
         '''检查鼠标点击事件'''
         if event.type == pygame.MOUSEBUTTONDOWN:  
-            if self.rect.collidepoint(pygame.mouse.get_pos()):  
-                print(f"Button '{self.text}' clicked!")  
+            if self.rect.collidepoint(pygame.mouse.get_pos()):
+                self.btn_flag = True
+                print(f"Button '{self.text}' clicked!")
+                return self.btn_flag
+            
+    def set_flag(self, flag):
+        '''设置按钮标志位'''
+        self.btn_flag = flag
+        return self.btn_flag
