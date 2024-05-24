@@ -1,6 +1,7 @@
 import pygame  
 import sys 
 import random
+import TextLibrary
 import Button
 
 version = '0.1.0'               # 游戏版本
@@ -45,6 +46,7 @@ exit_flag = True                                                # 弹出游戏�
 font_version = pygame.font.SysFont("segoeuisemibold", 11)       # 添加字体
 font = pygame.font.SysFont("simhei", 18)                        # 黑体
 font_small = pygame.font.SysFont("simhei", 16)
+text = TextLibrary.TextLibrary()
 """----------------------参数设置完毕----------------------"""
 while game_flag:  
   
@@ -94,7 +96,8 @@ while game_flag:
     bottom_right = (rect_box.x+rect_box.w, rect_box.y+rect_box.h)   # 右下角
 
     # 显示文字
-    info_str = "恭喜您收到了我们的博士录取通知书！您愿意来我们学院读博吗？"
+    # info_str = "恭喜您收到了我们的博士录取通知书！您愿意来我们学院读博吗？"
+    info_str = text.get_text('welcome')
     info_text = font.render(info_str, True, text_color, box_color)
     info_text_width, info_text_height = info_text.get_size()
     window.blit(info_text, (rect_box.x+margin,rect_box.y+margin))
