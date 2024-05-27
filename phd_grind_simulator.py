@@ -1,9 +1,7 @@
 import pygame  
 import sys 
-import random
 import json
 import Button
-from fun import add_date
 
 """----------------------1.1 设置初始参数----------------------"""
 version = '0.1.0'               # 游戏版本
@@ -59,10 +57,12 @@ with open('./data/status.json', 'r', encoding='utf-8') as f:
 
 with open('./data/flags.json', 'r',  encoding='utf-8') as f:
     flags = json.load(f)
-
+bg_music = pygame.mixer.Sound('./music/BGM074.ogg')             # 导入音乐
 """----------------------2 游戏开始----------------------"""
 info_str = message['welcome']
 btn4_str = button['reject']
+btn3_str = button['accept']
+bg_music.play()                                                 # 播放音乐
 while isgame_flag:  
   
     # 清除屏幕  
@@ -116,14 +116,14 @@ while isgame_flag:
 
     # 按钮区（从下往上建立）
     # 第四个按钮
-    # btn4_str = button['reject']
-    reject_btn = Button.Button(window, btn4_str, bottom_left[0]+margin, bottom_left[1]-base_height*2, base_width-2*margin, base_height*1.5)
-    reject_btn.draw()
+    if game_flag == "start" or game_flag == "end1":
+        reject_btn = Button.Button(window, btn4_str, bottom_left[0]+margin, bottom_left[1]-base_height*2, base_width-2*margin, base_height*1.5)
+        reject_btn.draw()
 
     # 第三个按钮
-    btn3_str = button['accept']
-    accept_btn = Button.Button(window, btn3_str, bottom_left[0]+margin, bottom_left[1]-base_height*3.5-0.5*margin, base_width-2*margin, base_height*1.5)  
-    accept_btn.draw()
+    if game_flag == "start":
+        accept_btn = Button.Button(window, btn3_str, bottom_left[0]+margin, bottom_left[1]-base_height*3.5-0.5*margin, base_width-2*margin, base_height*1.5)  
+        accept_btn.draw()
 
     # 第1年1月不显示这俩按钮
     if game_flag != "start" and game_flag != "end1":
@@ -193,26 +193,43 @@ while isgame_flag:
     # -------------------------------------------------------------------------------------------------------- #
     # 处理事件队列  
     # -------------------------------------------------------------------------------------------------------- #
+    
+    # accept_btn = Button.Button(window, btn3_str, bottom_left[0]+margin, bottom_left[1]-base_height*3.5-0.5*margin, base_width-2*margin, base_height*1.5)  
     for event in pygame.event.get():  
         if event.type == pygame.QUIT:  
             isgame_flag = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mh += 1
-            if mh > 12:
-                yr += 1
-                mh = 1
-        accept_btn_flag = accept_btn.handle_event(event)
-        reject_btn_flag = reject_btn.handle_event(event)
+            print(game_flag)
+            accept_btn_flag = accept_btn.handle_event(event)
+            reject_btn_flag = reject_btn.handle_event(event)
+                    
+            if game_flag == "start":
+                if reject_btn_flag:             # 判断是否按下“拒绝按钮”
+                    accept_btn.draw_del()
+                    game_flag = flags['end1']
+                    info_str = message['reject']
+                    btn4_str = button['restart']
+                    break                       # 跳出循环，不然就一直在event.type == pygame.MOUSEBUTTONDOWN里死循环了
+                if accept_btn_flag:             # 判断是否按下“接受”按钮
+                    # 点击“接受”按钮日期才会变化（顺序为：宽、高）
+                    if bottom_left[0]+margin < event.pos[0] < bottom_left[0]+margin+base_width-2*margin and bottom_left[1]-base_height*3.5-0.5*margin < event.pos[1] < bottom_left[1]-base_height*3.5-0.5*margin+base_height*1.5:
+                        mh += 1                 # 月数加1
+                        if mh > 12:             # 月数超过12的时候增加年数
+                            yr += 1
+                            mh = 1
+            if game_flag == "end1":
+                print(reject_btn_flag)
+                if reject_btn_flag:
+                    game_flag = flags['start']
+                    info_str = message['welcome']
+                    btn4_str = button['reject']
+                    btn3_str = button['accept']
+                    break
+            
     
     # -------------------------------------------------------------------------------------------------------- #
     # 游戏逻辑部分
     # -------------------------------------------------------------------------------------------------------- #
-    if reject_btn_flag:
-        accept_btn.set_flag(False)
-        game_flag = flags['end1']
-        info_str = message['reject']
-        btn3_str = button['accept']
-        btn4_str = button['restart']
 
   
     # 更新屏幕显示  
