@@ -62,7 +62,7 @@ bg_music = pygame.mixer.Sound('./music/BGM074.ogg')             # 导入音乐
 info_str = message['welcome']
 btn4_str = button['reject']
 btn3_str = button['accept']
-bg_music.play()                                                 # 播放音乐
+# bg_music.play()                                                 # 播放音乐
 while isgame_flag:  
   
     # 清除屏幕  
@@ -199,7 +199,6 @@ while isgame_flag:
         if event.type == pygame.QUIT:  
             isgame_flag = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            print(game_flag)
             accept_btn_flag = accept_btn.handle_event(event)
             reject_btn_flag = reject_btn.handle_event(event)
                     
@@ -218,7 +217,6 @@ while isgame_flag:
                             yr += 1
                             mh = 1
             if game_flag == "end1":
-                print(reject_btn_flag)
                 if reject_btn_flag:
                     game_flag = flags['start']
                     info_str = message['welcome']
@@ -236,7 +234,7 @@ while isgame_flag:
     pygame.display.flip()  
   
     # 控制帧率  
-    pygame.time.Clock().tick(24)  
+    pygame.time.Clock().tick(5)  
   
 # 退出游戏  
 pygame.quit()  
